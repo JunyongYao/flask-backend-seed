@@ -1,0 +1,45 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+    simple:
+        format: "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"
+    detailed:
+        format: "%(asctime)s - %(thread)d - %(name)s - %(filename)s [line:%(lineno)d] %(levelname)s - %(message)s"
+
+handlers:
+    console:
+        class: logging.StreamHandler
+        level: DEBUG
+        formatter: detailed
+        stream: ext://sys.stdout
+
+    info_file_handler:
+        class: logging.handlers.RotatingFileHandler
+        level: DEBUG
+        formatter: detailed
+        filename: info.log
+        # You can uncomment it to have log rotator, but it is highly recommend to use embeded log rotator if you are using linux to host server
+        #maxBytes: 10485760 
+        #backupCount: 20
+        encoding: utf8
+
+    error_file_handler:
+        class: logging.handlers.RotatingFileHandler
+        level: ERROR
+        formatter: detailed
+        filename: errors.log
+        # You can uncomment it to have log rotator, but it is highly recommend to use embeded log rotator if you are using linux to host server
+        #maxBytes: 10485760 
+        #backupCount: 20
+        encoding: utf8
+
+loggers:
+    my_module:
+        level: ERROR
+        handlers: [console]
+        propagate: no
+
+root:
+    level: DEBUG
+    handlers: [console, info_file_handler, error_file_handler]

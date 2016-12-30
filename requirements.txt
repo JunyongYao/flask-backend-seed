@@ -1,0 +1,16 @@
+Flask
+Flask-SQLAlchemy
+Flask-RESTful
+Flask-Mail
+Flask-Migrate
+Flask-Script
+flask-redis
+flask-cors
+coverage
+gunicorn
+gevent
+celery[redis] >= 4.0.2
+PyYAML
+mysqlclient
+pyzmq
+locustio >= 0.8a2

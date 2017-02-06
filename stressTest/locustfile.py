@@ -54,6 +54,7 @@ class UserBehaviorTasks(TaskSet):
     @task(1)
     def user_change_name(self):
         new_name = self.generate_random_string(5)
+        # this should follow format ("url, type, head_data, body_data") in a list
         url_info_list = [("/api/sample/user_info", "put", {"Token": self.token}, {"NewName": new_name}), ]
         self.send_concurrent_http_request(url_info_list)
 

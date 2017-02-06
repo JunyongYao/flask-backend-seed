@@ -8,7 +8,7 @@ from app import redis
 
 class UserInfoCache(object):
     @staticmethod
-    def verify_auth_token(token):
+    def verify_auth_token(token: str) -> int:
         cache_key = "CACHE_UserInfoCache_Token_{}".format(token)
         expire_in_seconds = 10 * 60
         cache_user_id = get_redis_data(cache_key)
@@ -32,7 +32,7 @@ class UserInfoCache(object):
         expire_in_seconds = 10 * 60
 
         @classmethod
-        def get(cls, user_id):
+        def get(cls, user_id: int) -> dict:
             cache_key = cls.key_pattern.format(user_id)
             data = get_redis_dict(cache_key)
 

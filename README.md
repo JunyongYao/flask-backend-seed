@@ -60,6 +60,12 @@ The test code should be within tests folder and an example is provided there.
 
 3. Check result. All should pass
 
+## How to expose the api document
+Currently, [swagger](http://swagger.io/) is used to generate restful api document auto. [flask-restful-swagger](https://github.com/rantav/flask-restful-swagger) is the module I selected.  
+By default, you can access [http://127.0.0.1:5000/api/spec.html](http://127.0.0.1:5000/api/spec.html) to get the list of provided api.  
+If it is the first time for you to use swagger, you should read [5.2 API Declaration](http://docs.swagger.io/spec.html) at first. 
+
+
 ## How to have stress test
 The stress test used locust as test engine. Please refer the sample within stressTest folder.
 
@@ -75,8 +81,9 @@ Here is the list of needed system environment during running, please check their
 * FLASK_COVERAGE: By default, it will be treated as enabled to get test code coverage.
 
 ## using linux embeded logrotator
-因为存在运行过程中，log太多的问题，log需要做rotate和压缩，在 /etc/logrotate.d目录里面，建立自己的log rotate逻辑，参数具体可[参考链接](http://www.softpanorama.org/Commercial_linuxes/RHEL/rhel_log_rotation.shtml)  
-我创建了如下一个 wechat_gunicorn文件，意思对于制定目录log文件，每天检查，超过10M就拿出来压缩成一个备份文件，创建一个新的文件供运行线程使用。最多备份20份。  
+To reduce disk space usage by logs, it is recommended to use logrotator for log compression.   
+The routine should be set in /etc/logrotate.d. And you can refer [here](http://www.softpanorama.org/Commercial_linuxes/RHEL/rhel_log_rotation.shtml) for details.  
+The following sample is a configuration I created which will check log file daily and compress it if log size exceeds 10MB. The maxium retain copies are 20.  
 
 ```
 /alidata/tk03/wechat/71-wechat-server/logs/*.log {
@@ -92,7 +99,7 @@ Here is the list of needed system environment during running, please check their
 }
 ```
 
-对于daily具体运行的时间，它是一个随机值，在 /etc/anacrontab中设置，时间方面
+It will be a good practice to use random running time to avoid hardware workload. Here is a sample in /etc/anacrontab.
 
 ```bash
 # the maximal random delay added to the base delay of the jobs

@@ -1,6 +1,7 @@
 Flask
 Flask-SQLAlchemy
 Flask-RESTful
+flask-restful-swagger
 Flask-Mail
 Flask-Migrate
 Flask-Script

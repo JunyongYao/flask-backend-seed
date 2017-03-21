@@ -13,10 +13,15 @@ def setup_logging(default_path='logging.yaml', default_level=logging.INFO, env_k
     if os.path.exists(default_yaml):
         with open(default_yaml, 'rt') as f:
             log_config = yaml.safe_load(f.read())
-            log_config["handlers"]["info_file_handler"]["filename"] = os.path.join(basedir, "logs",
+            root_log_dir = os.path.join(basedir, "logs")
+
+            if not os.path.exists(root_log_dir):
+                os.mkdir(root_log_dir)
+
+            log_config["handlers"]["info_file_handler"]["filename"] = os.path.join(root_log_dir,
                                                                                    log_config["handlers"][
                                                                                        "info_file_handler"]["filename"])
-            log_config["handlers"]["error_file_handler"]["filename"] = os.path.join(basedir, "logs",
+            log_config["handlers"]["error_file_handler"]["filename"] = os.path.join(root_log_dir,
                                                                                     log_config["handlers"][
                                                                                         "error_file_handler"][
                                                                                         "filename"])

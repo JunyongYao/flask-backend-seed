@@ -8,6 +8,7 @@ from flask_mail import Mail
 from flask_redis import FlaskRedis
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_restful_swagger import swagger
 
 db = SQLAlchemy()
 mail = Mail()
@@ -48,6 +49,9 @@ def create_app(active_config):
 
 def add_api_support(flask_app):
     api = Api(flask_app)
+    api = swagger.docs(api, apiVersion="0.1", produces=["application/json", "text/html"], api_spec_url='/api/spec',
+                       description='A Sample for API list')
+
     add_restapi_endpoints(api)
 
     logging.debug("Added rest api entries")

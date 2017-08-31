@@ -64,8 +64,15 @@ class Config:
 
     # for celery
     CELERY_TASK_SERIALIZER = 'json'
+    CELERY_ACCEPT_CONTENT = ['json', 'pickle']
     CELERY_BROKER_URL = "redis://127.0.0.1:6379/1"
     CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/1"
+    CELERY_TIMEZONE = "UTC+08:00"
+    # If the result should be handled, this value must be False
+    CELERY_IGNORE_RESULT = True
+    # If the timeout should exceeds this value, need to update the global setting and use task specific one
+    CELERYD_TASK_SOFT_TIME_LIMIT = 900
+    CELERYD_TASK_TIME_LIMIT = 1800
     # TODO: need to update if new async task should be imported
     CELERY_IMPORTS = ("task.asyncTask", )
     # this is one week length to align with business logic.

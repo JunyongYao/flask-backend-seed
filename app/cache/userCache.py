@@ -1,55 +1,48 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from app.cache.basic import DictCacheABC, DataCacheABC
 from app.model.userModel import UserInfo
-from app.cache import get_redis_dict, set_redis_dict_with_timeout, get_redis_data, set_redis_data_with_timeout
-from app import redis
 
 
 class UserInfoCache(object):
-    @staticmethod
-    def verify_auth_token(token: str) -> int:
-        cache_key = "CACHE_UserInfoCache_Token_{}".format(token)
-        expire_in_seconds = 10 * 60
-        cache_user_id = get_redis_data(cache_key)
+    class UserToken(DataCacheABC):
+        def __init__(self, token):
+            super().__init__()
+            self.token = token
 
-        if cache_user_id is None:
-            user_info = UserInfo.verify_auth_token(token)
+        @property
+        def cache_key(self):
+            return "CACHE_UserInfoCache_Token_{}".format(self.token)
+            pass
+
+        def data_retrieve_ops(self):
+            user_info = UserInfo.verify_auth_token(self.token)
             if user_info is None:
                 return None
 
-            cache_user_id = user_info.id
-            set_redis_data_with_timeout(cache_key, cache_user_id, expire_in_seconds)
-            logging.debug("Store token for {} which will expire after {} seconds".format(cache_key, expire_in_seconds))
-        else:
-            expire_in_seconds = redis.ttl(cache_key)
-            logging.debug("Use stored token data for user will expire after {} seconds".format(expire_in_seconds))
+            return user_info.id
 
-        return cache_user_id
+        @property
+        def expire_in_seconds(self):
+            return 10 * 60
 
-    class UserProfile(object):
-        key_pattern = "CACHE_UserInfoCache_UserProfile_{}"
-        expire_in_seconds = 10 * 60
+    class UserProfile(DictCacheABC):
+        def __init__(self, user_id):
+            super().__init__()
+            self.user_id = user_id
+            # if this is set, it will auto refresh token if user access this value under threshold time
+            self.auto_refresh_threshold = 3 * 60
 
-        @classmethod
-        def get(cls, user_id: int) -> dict:
-            cache_key = cls.key_pattern.format(user_id)
-            data = get_redis_dict(cache_key)
+        @property
+        def cache_key(self):
+            return "CACHE_UserInfoCache_UserProfile_{}".format(self.user_id)
 
-            if data is None:
-                user_info = UserInfo.get_user(user_id)
-                data = user_info.to_json()
+        @property
+        def expire_in_seconds(self):
+            return 30 * 60
 
-                set_redis_dict_with_timeout(cache_key, data, cls.expire_in_seconds)
-                logging.debug("Store user profile for {} which will expire after {} seconds".format(
-                    cache_key, cls.expire_in_seconds))
-            else:
-                expire_in_seconds = redis.ttl(cache_key)
-                logging.debug("Use stored user profile will expire after {} seconds".format(expire_in_seconds))
+        def data_retrieve_ops(self):
+            user_info = UserInfo.get_user(self.user_id)
+            return user_info.to_json()
 
-            return data
-
-        @classmethod
-        def clear(cls, user_id):
-            cache_key = cls.key_pattern.format(user_id)
-            redis.delete(cache_key)

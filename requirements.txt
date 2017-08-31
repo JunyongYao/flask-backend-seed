@@ -1,3 +1,4 @@
+sqlalchemy
 Flask
 Flask-SQLAlchemy
 Flask-RESTful

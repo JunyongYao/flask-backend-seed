@@ -2,6 +2,9 @@
 
 import time
 
+import logging
+
+import pickle
 from celery.utils.log import get_task_logger
 from celery.signals import task_postrun
 
@@ -21,7 +24,7 @@ def close_session(*args, **kwargs):
     db.session.remove()
 
 
-@celery_app.task
+@celery_app.task(soft_time_limit=10, time_limit=20)
 def send_async_email(title, body):
     logger.debug("Send async mail with title {} and body {}".format(title, body))
     send_mail(title, body)
@@ -60,3 +63,21 @@ def send_async_info_with_retry(self, info):
     except Exception as exc:
         logger.warning("Has Exception {}".format(str(exc)))
         self.retry(exc=exc, countdown=10)
+
+
+@celery_app.task(soft_time_limit=30, time_limit=60)
+def sync_test(arg):
+    logging.info("Got args from caller {}".format(arg))
+
+
+@celery_app.task(soft_time_limit=120, time_limit=240)
+def refresh_cache(pickle_obj):
+    """
+    It uses pickle_obj to refresh the cache. This is a lower priority task. Therefore, no retry will be triggered if
+    there is failure.
+    One known issue is, there might be 'OperationalError, 2013' error during query database.
+    This solution supports distributed task queue. And it sacrifices security to get better re-use and neat code.
+    """
+    run_obj = pickle.loads(pickle_obj)
+    logging.info("Refresh for key {}".format(run_obj.cache_key))
+    run_obj.refresh()

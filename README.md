@@ -1,7 +1,7 @@
-It is built mainly with python 3.5 and flask. This project is not compatible with python 2.7
+It is built mainly with python 3.6 and flask. This project is not compatible with python 2.7
 
 ## Environment preparation.
-1. For python3.5, must run ** sudo apt-get install python3.5-dev python3-setuptools ** at first. Otherwise, there will be issue for installing required packages.
+1. For python3.6, must run ** sudo apt-get install python3.6-dev python3-setuptools ** at first. Otherwise, there will be issue for installing required packages.
 2. Highly recommend to use virtualenv or conda for isolating python running environment.
 3. For installation on ubuntu, please run following to install the dependencies
   > sudo apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk libffi-dev libssl-dev python3-dev libmysqlclient-dev

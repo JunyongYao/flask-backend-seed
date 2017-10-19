@@ -5,7 +5,7 @@ class Permission(object):
     @classmethod
     def validate(cls, user_id):
         # Override when subclassing to add additional checks
-        pass
+        raise NotImplementedError("Need to implement it in subclass!")
 
 
 class AlwaysPass(Permission):

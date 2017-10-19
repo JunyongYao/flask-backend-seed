@@ -56,6 +56,7 @@ class Config:
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
     # TODO: the receiver mail for alert, please fill in your account
+    # default recipient
     RECIPIENTS = ['receiver_A@XXXXX.com', 'receiver_B@XXXXX.com']
     SENDER = "monitor@XXXX.com"
 
@@ -86,6 +87,13 @@ class DevelopmentConfig(Config):
     DEBUG = True
     REVERSE_PROXY = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL')
+
+    # email server
+    MAIL_SERVER = 'smtp.ym.163.com'
+    MAIL_USERNAME = "monitor@XXXX.com"
+    MAIL_PASSWORD = "monitor_password"
+
+    SENDER = "monitor@XXXX.com"
 
 
 class TestingConfig(Config):

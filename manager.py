@@ -52,5 +52,6 @@ def test(coverage=True):
 def index():
     return "hello from manager"
 
+
 if __name__ == '__main__':
     manager.run()

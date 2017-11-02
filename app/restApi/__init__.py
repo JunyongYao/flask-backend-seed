@@ -3,14 +3,15 @@ import functools
 import logging
 import sys
 import traceback
-from flask import make_response, current_app, jsonify
+from flask import make_response, current_app, jsonify, request
 from flask_restful import Resource, reqparse
 from sqlalchemy.exc import SQLAlchemyError
 from flask_sqlalchemy import get_debug_queries
 
 from app import db
 from app.cache.userCache import UserInfoCache
-from app.swagger.contants import ERR_MSG_INVALID_TOKEN, ERR_MSG_INVALID_PERMISSION
+from app.swagger.contants import ERR_MSG_INVALID_TOKEN, ERR_MSG_INVALID_PERMISSION, ERR_INVALID_SIGH
+from app.util.common import get_dict_sign
 
 
 def handle_db_exception_inner(func):
@@ -59,6 +60,38 @@ def login_required(func):
     return inner
 
 
+def query_authorized(func):
+    """
+    Signing the query parameters sorted in lower-case, alphabetical order using the private credential as the signing
+    token.
+    Signing should occur before URL encoding the query string.
+    """
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        # only check the query string
+        logging.info("url is {} for method {}".format(request.url_rule, request.method))
+
+        valid_query_param_dict = {}
+        found_sign_val = None
+        for key, value in request.args.items():
+            logging.info("Arg is {}:{}".format(key, value))
+            if str(key).lower() != "signature":
+                valid_query_param_dict[key] = value
+            else:
+                found_sign_val = value
+
+        if not found_sign_val:
+            return make_response(jsonify(ERR_INVALID_SIGH), 400)
+
+        compute_val = get_dict_sign(request.url_rule, valid_query_param_dict)
+        if compute_val != found_sign_val:
+            return make_response(jsonify(ERR_INVALID_SIGH), 400)
+
+        return func(*args, **kwargs)
+
+    return inner
+
+
 def permission_validate(*permission_class_list):
     def wrapper(func):
         @functools.wraps(func)
@@ -83,10 +116,24 @@ def permission_validate(*permission_class_list):
     return wrapper
 
 
-class ProtectedResource(Resource):
+class TokenAuthenticatedResource(Resource):
+    """
+    The resource will use Token inside header to ensure than only valid user can call APIs.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.USER_ID = None
 
     # Be careful for the order in this decorator list. The previous one will be the inner one in the decorate chain.
     method_decorators = [login_required, handle_db_exception_inner]
+
+
+class SignAuthorizedResource(Resource):
+    """
+    The resource will use sign in query to ensure the request will be called by authorized client.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    # Be careful for the order in this decorator list. The previous one will be the inner one in the decorate chain.
+    method_decorators = [query_authorized, handle_db_exception_inner]

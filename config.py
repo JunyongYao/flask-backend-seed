@@ -37,6 +37,7 @@ def setup_logging(default_path='logging.yaml', default_level=logging.INFO, env_k
 class Config:
     SECRET_KEY = os.environ.get(
         'SECRET_KEY') or r"xkb\xe4\x06\x83\xa9\xd1,=\x85\xa9w\xda'\xcc\x12\x1a\x84\xd71}\xab\x1b"
+    SIGN_KEY = os.environ.get('SIGN_KEY') or r"temp_sign_key_for_debug"
 
     # MYSQL Server configuration
     MYSQL_DATABASE_CHARSET = "utf8mb4"

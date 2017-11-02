@@ -8,12 +8,12 @@ from app import db
 from app.cache.userCache import UserInfoCache
 from app.model.userModel import UserInfo
 from app.permission import permissions
-from app.restApi import ProtectedResource, handle_db_exception_inner, permission_validate
+from app.restApi import TokenAuthenticatedResource, handle_db_exception_inner, permission_validate
 from task.asyncTask import send_async_info_with_retry, send_async_email
 
 
 # This class uses ProtectedResource which will ensure user's token is valid
-class UserInfoProvider(ProtectedResource):
+class UserInfoProvider(TokenAuthenticatedResource):
     # Sample to set permission for interface.
     @permission_validate(permissions.AlwaysPass)
     def get(self):

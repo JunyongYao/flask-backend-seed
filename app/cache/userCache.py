@@ -14,7 +14,6 @@ class UserInfoCache(object):
         @property
         def cache_key(self):
             return "CACHE_UserInfoCache_Token_{}".format(self.token)
-            pass
 
         def data_retrieve_ops(self):
             user_info = UserInfo.verify_auth_token(self.token)

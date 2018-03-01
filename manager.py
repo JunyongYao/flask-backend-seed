@@ -28,9 +28,10 @@ if os.environ.get('FLASK_COVERAGE'):
 
 
 @manager.command
-def test(coverage=True):
+# The flask script can be used for some cli command which should access database.
+def test(enable_cov=True):
     """Run the unit tests."""
-    if coverage and not os.environ.get('FLASK_COVERAGE'):
+    if enable_cov and not os.environ.get('FLASK_COVERAGE'):
         os.environ['FLASK_COVERAGE'] = '1'
         os.execvp(sys.executable, [sys.executable] + sys.argv)
 

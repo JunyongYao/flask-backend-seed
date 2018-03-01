@@ -1,6 +1,10 @@
 import logging
 
 
+"""
+Use them as decorator for rest api entry function to enable permission check. 
+"""
+
 class Permission(object):
     @classmethod
     def validate(cls, user_id):

@@ -7,8 +7,19 @@ from flask_cors import CORS
 from flask_mail import Mail
 from flask_redis import FlaskRedis
 from flask_restful import Api
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy as BaseSA
 from flask_restful_swagger import swagger
+
+
+class SQLAlchemy(BaseSA):
+    def apply_pool_defaults(self, app, options):
+        BaseSA.apply_pool_defaults(self, app, options)
+        # As mentioned in http://docs.sqlalchemy.org/en/latest/core/pooling.html#sqlalchemy.pool.QueuePool,
+        #   the “pre_ping” will try up to three times before giving up, propagating the database error last received.
+        # It will use to bypass issue that sql connection was recycled, then, further sql operation will have
+        #  OperationError.
+        options["pool_pre_ping"] = True
+
 
 db = SQLAlchemy()
 mail = Mail()

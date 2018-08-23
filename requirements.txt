@@ -1,3 +1,4 @@
+pytz
 sqlalchemy
 Flask
 Flask-SQLAlchemy
@@ -8,7 +9,7 @@ Flask-Migrate
 Flask-Script
 flask-redis
 flask-cors
-SQLAlchemy >= 1.2
+SQLAlchemy
 coverage
 gunicorn
 gevent

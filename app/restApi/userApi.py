@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
+from pytz import timezone
+from datetime import datetime, timedelta
 
 from flask import make_response, jsonify
 from flask_restful import Resource, reqparse
@@ -48,6 +50,9 @@ class BackgroundTaskProvider(Resource):
 
         # do some background task after 15 seconds
         logging.debug("This task will be pushed to celery and executed after 15 seconds")
-        send_async_email.apply_async(args=["mail title", "mail body"], countdown=15)
+        # use time zone instead of countdown to avoid utc issue
+        sh_tz = timezone('Asia/Shanghai')
+        send_async_email.apply_async(args=["mail title", "mail body"],
+                                     eta=sh_tz.localize(datetime.now()) + timedelta(seconds=15))
 
         return make_response("OK", 200)

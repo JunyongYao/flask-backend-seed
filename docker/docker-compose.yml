@@ -1,0 +1,45 @@
+version: "2"
+
+services:
+   flask_app:
+      build: flask
+      depends_on:
+        - db
+        - redis
+      links:
+        - redis
+        - db
+      ports:
+        - "5000:5000"
+      volumes:
+        - /Users/junyong/Develop/git/github/flask-backend-seed/:/deploy/app
+      environment:
+        - RUN_CONFIG=development
+        - DEV_DATABASE_URL=mysql://test:123@db:3306/test_db?unix_socket=/tmp/mysql.sock&charset=utf8mb4
+
+   redis:
+      image: redis:4
+      ports:
+        - "6379:6379"
+
+   nginx:
+      build: nginx
+      depends_on:
+        - flask_app
+      links:
+        - flask_app
+      ports:
+        - "80:80"
+
+   db:
+      build: mysql/
+      command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone='+08:00'
+      restart: always
+      environment:
+        - MYSQL_DATABASE=test_db
+        - MYSQL_USER=test
+        - MYSQL_PASSWORD=123
+      ports:
+        - "3306:3306"
+      volumes:
+        - /Users/junyong/Develop/docker_data/mysql/:/var/lib/mysql

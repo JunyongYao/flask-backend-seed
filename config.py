@@ -62,13 +62,13 @@ class Config:
     SENDER = "monitor@XXXX.com"
 
     # for redis cache
-    REDIS_URL = "redis://127.0.0.1:6379/0"
+    REDIS_URL = "redis://redis:6379/0"
 
     # for celery
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_ACCEPT_CONTENT = ['json', 'pickle']
-    CELERY_BROKER_URL = "redis://127.0.0.1:6379/1"
-    CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/1"
+    CELERY_BROKER_URL = "redis://redis:6379/1"
+    CELERY_RESULT_BACKEND = "redis://redis:6379/1"
     CELERY_TIMEZONE = "UTC+08:00"
     # If the result should be handled, this value must be False
     CELERY_IGNORE_RESULT = True

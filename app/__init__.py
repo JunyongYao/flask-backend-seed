@@ -53,6 +53,7 @@ def create_app(active_config):
     db.init_app(flask_app)
     # the Flask-SQLAlchemy needs current app to run
     with flask_app.app_context():
+        from app.model.userModel import UserInfo
         db.create_all()
 
     return flask_app

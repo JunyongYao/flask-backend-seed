@@ -1,0 +1,20 @@
+pytz
+sqlalchemy
+Flask
+Flask-SQLAlchemy
+Flask-RESTful
+flask-restful-swagger
+Flask-Mail
+Flask-Migrate
+Flask-Script
+flask-redis
+flask-cors
+SQLAlchemy
+coverage
+gunicorn
+gevent
+celery[redis] >= 4.0.2
+PyYAML
+mysqlclient
+pyzmq
+locustio >= 0.8a2

@@ -4,20 +4,59 @@ services:
    flask_app:
       build: flask
       depends_on:
-        - db
-        - redis
+        - mysql_db
+        - redis_server
       links:
-        - redis
-        - db
+        - redis_server
+        - mysql_db
       ports:
         - "5000:5000"
       volumes:
         - /Users/junyong/Develop/git/github/flask-backend-seed/:/deploy/app
       environment:
         - RUN_CONFIG=development
-        - DEV_DATABASE_URL=mysql://test:123@db:3306/test_db?unix_socket=/tmp/mysql.sock&charset=utf8mb4
+        - DEV_DATABASE_URL=mysql://test:123@mysql_db:3306/test_db?unix_socket=/tmp/mysql.sock&charset=utf8mb4
+        - REDIS_URL=redis://redis_server:6379/0
 
-   redis:
+   celery_queue:
+      build: flask
+      depends_on:
+        - mysql_db
+        - redis_server
+      links:
+        - redis_server
+        - mysql_db
+      volumes:
+        - /Users/junyong/Develop/git/github/flask-backend-seed/:/deploy/app
+      environment:
+        - RUN_CONFIG=development
+        - DEV_DATABASE_URL=mysql://test:123@mysql_db:3306/test_db?unix_socket=/tmp/mysql.sock&charset=utf8mb4
+        - REDIS_URL=redis://redis_server:6379/0
+        - CELERY_BROKER_URL=redis://redis_server:6379/1
+        - CELERY_RESULT_BACKEND=redis://redis_server:6379/1
+        - C_FORCE_ROOT=True
+      command: ["celery", "worker",  "-A",  "celery_worker",  "-l" , "INFO",  "-Ofair"]
+
+   celery_scheduler:
+      build: flask
+      depends_on:
+        - mysql_db
+        - redis_server
+      links:
+        - redis_server
+        - mysql_db
+      volumes:
+        - /Users/junyong/Develop/git/github/flask-backend-seed/:/deploy/app
+      environment:
+        - RUN_CONFIG=development
+        - DEV_DATABASE_URL=mysql://test:123@mysql_db:3306/test_db?unix_socket=/tmp/mysql.sock&charset=utf8mb4
+        - REDIS_URL=redis://redis_server:6379/0
+        - CELERY_BROKER_URL=redis://redis_server:6379/1
+        - CELERY_RESULT_BACKEND=redis://redis_server:6379/1
+        - C_FORCE_ROOT=True
+      command: ["celery", "-A",  "celery_worker",  "beat"]
+
+   redis_server:
       image: redis:4
       ports:
         - "6379:6379"
@@ -31,7 +70,7 @@ services:
       ports:
         - "80:80"
 
-   db:
+   mysql_db:
       build: mysql/
       command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone='+08:00'
       restart: always
